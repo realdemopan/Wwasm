@@ -342,7 +342,7 @@ RB_TestFlare
 ==================
 */
 void RB_TestFlare( flare_t *f ) {
-#if !defined(USE_OPENGLES) && !defined(__EMSCRIPTEN__)
+#ifndef USE_OPENGLES
 	float			depth;
 #endif
 	qboolean		visible;
@@ -356,10 +356,14 @@ void RB_TestFlare( flare_t *f ) {
 	glState.finishCalled = qfalse;
 
 	// read back the z buffer contents
-#if defined(USE_OPENGLES) || defined(__EMSCRIPTEN__)
+#ifdef USE_OPENGLES
 	screenZ = 0;
 #else
+#ifdef __EMSCRIPTEN__
+	depth = 1.0f;
+#else
 	qglReadPixels( f->windowX, f->windowY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth );
+#endif // __EMSCRIPTEN__
 
 	screenZ = backEnd.viewParms.projectionMatrix[14] / 
 		( ( 2*depth - 1 ) * backEnd.viewParms.projectionMatrix[11] - backEnd.viewParms.projectionMatrix[10] );
